@@ -7,12 +7,39 @@ import sqlalchemy.orm.query
 
 
 class Query(sqlalchemy.orm.query.Query):
+    """The subtype of :class:`sqlalchemy.orm.query.Query` class, that provides
+    the :meth:`promise()` method.
+
+    You can make this the default query class of your session::
+
+        from sqlalchemy.orm import sessionmaker
+        import future
+        Session = sessionmaker(query_cls=future.Query)
+
+    """
 
     def promise(self):
+        """Makes a promise and returns a :class:`Future`.
+
+        :returns: the promised future
+        :rtype: :class:`Future`
+
+        """
         return Future(self)
 
 
 class Future(object):
+    """Promoise future query.
+
+    :param query: the query to promise
+    :type query: :class:`sqlalchemy.orm.query.Query`
+
+    .. warning::
+    
+       It is not a subtype of :class:`Query`, so it does not provide any
+       method of :class:`Query` like :meth:`~Query.filter()`.
+
+    """
 
     __slots__ = "query", "_iter", "_head", "_thread"
 
@@ -47,5 +74,13 @@ class Future(object):
             yield value
 
     def all(self):
+        """Returns the results promised as a :class:`list`. This blocks the
+        underlying execution thread until the execution has finished if it
+        is not yet.
+
+        :returns: the results promised
+        :rtype: :class:`list`
+
+        """
         return list(self)
 
