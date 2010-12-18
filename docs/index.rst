@@ -5,6 +5,7 @@
 
 .. automodule:: future
    :members:
+   :show-inheritance:
 
 
 Indices and tables

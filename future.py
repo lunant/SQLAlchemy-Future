@@ -61,7 +61,7 @@ class Future(object):
     :param query: the query to promise
     :type query: :class:`sqlalchemy.orm.query.Query`
 
-    .. warning::
+    .. note::
     
        It is not a subtype of :class:`Query`, so it does not provide any
        method of :class:`Query` like :meth:`~Query.filter()`.
