@@ -1,6 +1,33 @@
 """:mod:`future` --- SQLAlchemy-Future
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+SQLAlchemy-Future is a SQLAlchemy_ extension that introduces `future/promise`_
+into query.
+
+.. _SQLAlchemy: http://www.sqlalchemy.org/
+.. _future/promise: http://en.wikipedia.org/wiki/Futures_and_promises
+
+
+What it improves
+================
+
+Assume we are building a web application that depends on SQLAlchemy. Typically
+web applications are structured by models, controllers and templates (views).
+Most of logical operations depends on models are finished in controllers.
+
+::
+
+    def timeline():
+        session = Session()
+        timeline = session.query(Activity).order_by(Activity.created_at.desc())
+        return render_template('timeline.html', timeline=timeline)
+
+(To be filled.)
+
+
+References
+==========
+
 """
 import threading
 import sqlalchemy.orm.query
