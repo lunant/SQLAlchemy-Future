@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SQLAlchemy-Future &mdash; SQLAlchemy-Future v0.1 documentation</title>
+    <link rel="stylesheet" href="_static/customstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="SQLAlchemy-Future v0.1 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">SQLAlchemy-Future v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            
+  <div class="section" id="sqlalchemy-future">
+<h1>SQLAlchemy-Future<a class="headerlink" href="#sqlalchemy-future" title="Permalink to this headline">¶</a></h1>
+<p>SQLAlchemy-Future is a <a class="reference external" href="http://www.sqlalchemy.org/">SQLAlchemy</a> extension that introduces <a class="reference external" href="http://en.wikipedia.org/wiki/Futures_and_promises">future/promise</a>
+into query.</p>
+<div class="section" id="what-it-improves">
+<h2>What it improves<a class="headerlink" href="#what-it-improves" title="Permalink to this headline">¶</a></h2>
+<p>Assume we are building a web application that depends on <a class="reference external" href="http://www.sqlalchemy.org/">SQLAlchemy</a>. Typical
+web applications are structured by models, controllers and templates (views).
+Most of operations that depend on models are finished in controllers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">list_posts</span><span class="p">():</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Post</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s">&#39;list_posts.html&#39;</span><span class="p">,</span> <span class="n">posts</span><span class="o">=</span><span class="n">posts</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Codes like this pattern cause a <em>blank screen</em> when the browser are loading it.
+Then, the result list are rendered suddenly at once.</p>
+<p>To avoid the <em>blank screen</em>, we can make queries lazy:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">list_posts</span><span class="p">():</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Post</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s">&#39;list_posts.html&#39;</span><span class="p">,</span> <span class="n">posts</span><span class="o">=</span><span class="n">posts</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See the difference between both second lines of the former example code and the
+current. The first example calls the <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query.all" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-meth docutils literal"><span class="pre">all()</span></tt></a>
+method of the query object, but the second does not. SQLAlchemy&#8217;s query objects
+don&#8217;t execute itself and fetch its result until it has <em>realized</em>
+(for example, looped under <tt class="xref std std-keyword docutils literal"><span class="pre">for</span></tt> statement, or applied to
+<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">list()</span></tt></a> or <a class="reference external" href="http://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><tt class="xref py py-func docutils literal"><span class="pre">tuple()</span></tt></a>), and the only purpose of the
+<a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query.all" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-meth docutils literal"><span class="pre">all()</span></tt></a> method is just to realize the query.
+In short, query objects are <em>implicitly</em> executed when they are <em>really needed</em>.</p>
+<p>So, execution and fetching the result set of the <tt class="docutils literal"><span class="pre">posts</span></tt> query happen while
+the template is being rendered. As a result, the browser renders whole result
+list slightly slowly but gradually. This <em>lazy</em> approach helps hasty users
+to feel that they are waiting less, but total elapsed time still doesn&#8217;t become
+shorter.</p>
+<p>What SQLAlchemy-Future does is helping programmers to parallelize queries
+easily. What you have to do is just to place <a class="reference internal" href="#future.Query.promise" title="future.Query.promise"><tt class="xref py py-meth docutils literal"><span class="pre">promise()</span></tt></a>
+methods where <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query.all" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-meth docutils literal"><span class="pre">all()</span></tt></a> methods may come:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">list_posts</span><span class="p">():</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Post</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">promise</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s">&#39;list_posts.html&#39;</span><span class="p">,</span> <span class="n">posts</span><span class="o">=</span><span class="n">posts</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When the <a class="reference internal" href="#future.Query.promise" title="future.Query.promise"><tt class="xref py py-meth docutils literal"><span class="pre">promise()</span></tt></a> method is called, it creates an
+another thread for the future. And the execution of the query has started
+running in the created underneath thread. The <tt class="docutils literal"><span class="pre">posts</span></tt> object, the return
+value which is an instance of <a class="reference internal" href="#future.Future" title="future.Future"><tt class="xref py py-class docutils literal"><span class="pre">Future</span></tt></a>, is similar to the lazy
+result set object explained above. It is not a real result set physically,
+but the <em>promised</em> result set. If iteration over <tt class="docutils literal"><span class="pre">posts</span></tt>,
+promised result set, has tried, it fetches immediately the <em>real</em> result set
+of the execution which is run from the underneath thread, or if the result set
+isn&#8217;t prepared, it waits for the underneath thread to finish its query
+execution (that may be some prepared already).</p>
+<p>As result, similarly to the lazy approach of the above, the browser renders
+result list gradually, but unlike to the lazy approach, relatively fast.</p>
+</div>
+<div class="section" id="how-to-setup">
+<h2>How to setup<a class="headerlink" href="#how-to-setup" title="Permalink to this headline">¶</a></h2>
+<p>In order to make <a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">future.Query</span></tt></a> the default query class, use the
+<tt class="docutils literal"><span class="pre">query_cls</span></tt> parameter of the <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/session.html#sqlalchemy.orm.session.sessionmaker" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-func docutils literal"><span class="pre">sessionmaker()</span></tt></a>
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">future</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.session</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">query_cls</span><span class="o">=</span><span class="n">future</span><span class="o">.</span><span class="n">Query</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or you can make <a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">future.Query</span></tt></a> the query class of a session instance
+optionally:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">query_cls</span><span class="o">=</span><span class="n">future</span><span class="o">.</span><span class="n">Query</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-promise">
+<h2>How to promise<a class="headerlink" href="#how-to-promise" title="Permalink to this headline">¶</a></h2>
+<p>How to promise a future query is not hard. Just call the
+<a class="reference internal" href="#future.Query.promise" title="future.Query.promise"><tt class="xref py py-meth docutils literal"><span class="pre">promise()</span></tt></a> method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">posts</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span><span class="o">.</span><span class="n">promise</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Its return type is <a class="reference internal" href="#future.Future" title="future.Future"><tt class="xref py py-class docutils literal"><span class="pre">Future</span></tt></a> (note that it is not a subtype of
+<a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">Query</span></tt></a>, so you cannot use rich facilities of
+<a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">Query</span></tt></a> like <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query.filter" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-meth docutils literal"><span class="pre">filter()</span></tt></a>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">posts</span><span class="p">,</span> <span class="n">future</span><span class="o">.</span><span class="n">Future</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, iterate this future query (<tt class="docutils literal"><span class="pre">posts</span></tt> in the example) when you really
+need it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="s">&quot;by&quot;</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">author</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">posts</span></tt> finished the execution in the another thread, it fetches the
+result set immediately. If its execution hasn&#8217;t finished, the another thread
+joins the main thread and it has blocked until its execution has finished.</p>
+<span class="target" id="module-future"></span></div>
+<div class="section" id="future-references">
+<h2><a class="reference internal" href="#module-future" title="future"><tt class="xref py py-mod docutils literal"><span class="pre">future</span></tt></a> &#8212; References<a class="headerlink" href="#future-references" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="future.Query">
+<em class="property">class </em><tt class="descclassname">future.</tt><tt class="descname">Query</tt><big>(</big><em>entities</em>, <em>session=None</em><big>)</big><a class="headerlink" href="#future.Query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-class docutils literal"><span class="pre">sqlalchemy.orm.query.Query</span></tt></a></p>
+<p>The subtype of <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-class docutils literal"><span class="pre">sqlalchemy.orm.query.Query</span></tt></a> class, that provides
+the <a class="reference internal" href="#future.Query.promise" title="future.Query.promise"><tt class="xref py py-meth docutils literal"><span class="pre">promise()</span></tt></a> method.</p>
+<p>You can make this the default query class of your session:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>
+<span class="kn">import</span> <span class="nn">future</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">query_cls</span><span class="o">=</span><span class="n">future</span><span class="o">.</span><span class="n">Query</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="future.Query.promise">
+<tt class="descname">promise</tt><big>(</big><big>)</big><a class="headerlink" href="#future.Query.promise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a promise and returns a <a class="reference internal" href="#future.Future" title="future.Future"><tt class="xref py py-class docutils literal"><span class="pre">Future</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the promised future</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#future.Future" title="future.Future"><tt class="xref py py-class docutils literal"><span class="pre">Future</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="future.Future">
+<em class="property">class </em><tt class="descclassname">future.</tt><tt class="descname">Future</tt><big>(</big><em>query</em><big>)</big><a class="headerlink" href="#future.Future" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Promoised future query result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query</strong> (<a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-class docutils literal"><span class="pre">sqlalchemy.orm.query.Query</span></tt></a>) &#8211; the query to promise</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is not a subtype of <a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">Query</span></tt></a>, so it does not provide any
+method of <a class="reference internal" href="#future.Query" title="future.Query"><tt class="xref py py-class docutils literal"><span class="pre">Query</span></tt></a> like <tt class="xref py py-meth docutils literal"><span class="pre">filter()</span></tt>.</p>
+</div>
+<dl class="method">
+<dt id="future.Future.all">
+<tt class="descname">all</tt><big>(</big><big>)</big><a class="headerlink" href="#future.Future.all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the results promised as a <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt>. This blocks the
+underlying execution thread until the execution has finished if it
+is not yet.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the results promised</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">SQLAlchemy-Future v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Lunant.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
