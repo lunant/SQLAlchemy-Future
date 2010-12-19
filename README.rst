@@ -8,7 +8,6 @@ Read the documentation for details:
 
 http://lunant.github.com/SQLAlchemy-Future/
 
-
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _future/promise: http://en.wikipedia.org/wiki/Futures_and_promises
 
