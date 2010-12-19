@@ -130,6 +130,24 @@ joins the main thread and it has blocked until its execution has finished.
   :show-inheritance:
 
 
+Further informations
+====================
+
+It is written by `Hong Minhee`_ and distributed under `MIT license`_.
+
+The source code can be found from the GitHub project page and checked out
+via Git.
+
+https://github.com/lunant/SQLAlchemy-Future
+
+.. sourcecode:: bash
+
+   $ git clone git://github.com/lunant/SQLAlchemy-Future.git
+
+.. _Hong Minhee: http://dahlia.kr/
+.. _MIT license: http://www.opensource.org/licenses/mit-license.php
+
+
 Indices and tables
 ==================
 
