@@ -8,6 +8,7 @@ setup(name="SQLAlchemy-Future",
       version="0.1",
       description="SQLAlchemy extension that introduces future and promise "
                   "for query",
+      url="http://lunant.github.com/SQLAlchemy-Future/",
       author="Hong Minhee",
       author_email="dahlia" "@" "lunant.com",
       py_modules=["future"],
