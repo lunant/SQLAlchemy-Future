@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SQLAlchemy-Future'
-copyright = u'2010, Hong Minhee'
+copyright = u'2010, Lunant'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -81,7 +81,7 @@ exclude_patterns = ['_build']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'pastie'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -91,12 +91,20 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'nature'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {'nosidebar': True}
+html_theme_options = {'nosidebar': True,
+                      'footerbgcolor': '#4c1b1b',
+                      'relbarbgcolor': '#b9121b',
+                      'headtextcolor': '#4c1b1b',
+                      'linkcolor': '#b9121b',
+                      'visitedlinkcolor': '#bd8d46',
+                      'codebgcolor': '#fcfae1',
+                      'codetextcolor': 'black'}
+html_style = 'customstyle.css'
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -128,7 +136,7 @@ html_static_path = ['_static']
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-#html_use_smartypants = True
+html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}

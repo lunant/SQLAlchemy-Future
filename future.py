@@ -8,21 +8,46 @@ into query.
 .. _future/promise: http://en.wikipedia.org/wiki/Futures_and_promises
 
 
-What it improves
-================
+How to setup
+============
 
-Assume we are building a web application that depends on SQLAlchemy. Typically
-web applications are structured by models, controllers and templates (views).
-Most of logical operations depends on models are finished in controllers.
+In order to make :class:`future.Query <Query>` the default query class, use
+the ``query_cls`` parameter of the
+:func:`~sqlalchemy.orm.session.sessionmaker()` function::
 
-::
+    import future
+    from sqlalchemy.orm.session import sessionmaker
+    Session = sessionmaker(query_cls=future.Query)
 
-    def timeline():
-        session = Session()
-        timeline = session.query(Activity).order_by(Activity.created_at.desc())
-        return render_template('timeline.html', timeline=timeline)
+Or you can make :class:`future.Query <Query>` the query class of a session
+instance optionally::
 
-(To be filled.)
+    session = Session(query_cls=future.Query)
+
+
+How to promise
+==============
+
+How to promise a future query is not hard. Just call the
+:meth:`~Query.promise()` method::
+
+    posts = session.query(Post).promise()
+
+Its return type is :class:`Future` (note that it is not a subtype of
+:class:`Query`, so you cannot use rich facilities of :class:`Query` like
+:meth:`~sqlalchemy.orm.query.Query.filter`)::
+
+    assert isinstance(posts, future.Future)
+
+Then, iterate this future query (``posts`` in the example) when you really
+need it::
+
+    for post in posts:
+        print post.title, "by", post.author
+
+If the ``posts`` finished the execution in the another thread, it fetches the
+result set immediately. If its execution hasn't finished, the another thread
+joins the main thread and it has blocked until its execution has finished.
 
 
 References
@@ -56,7 +81,7 @@ class Query(sqlalchemy.orm.query.Query):
 
 
 class Future(object):
-    """Promoise future query.
+    """Promoised future query result.
 
     :param query: the query to promise
     :type query: :class:`sqlalchemy.orm.query.Query`
