@@ -59,6 +59,7 @@ Most of operations that depend on models are finished in controllers.</p>
 </div>
 <p>Codes like this pattern cause a <em>blank screen</em> when the browser are loading it.
 Then, the result list are rendered suddenly at once.</p>
+<img alt="_images/eager-loading.gif" src="_images/eager-loading.gif" />
 <p>To avoid the <em>blank screen</em>, we can make queries lazy:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">list_posts</span><span class="p">():</span>
     <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
@@ -79,6 +80,7 @@ the template is being rendered. As a result, the browser renders whole result
 list slightly slowly but gradually. This <em>lazy</em> approach helps hasty users
 to feel that they are waiting less, but total elapsed time still doesn&#8217;t become
 shorter.</p>
+<img alt="_images/lazy-loading.gif" src="_images/lazy-loading.gif" />
 <p>What SQLAlchemy-Future does is helping programmers to parallelize queries
 easily. What you have to do is just to place <a class="reference internal" href="#future.Query.promise" title="future.Query.promise"><tt class="xref py py-meth docutils literal"><span class="pre">promise()</span></tt></a>
 methods where <a class="reference external" href="http://www.sqlalchemy.org/docs/orm/query.html#sqlalchemy.orm.query.Query.all" title="(in SQLAlchemy v0.6.6)"><tt class="xref py py-meth docutils literal"><span class="pre">all()</span></tt></a> methods may come:</p>
@@ -100,6 +102,7 @@ isn&#8217;t prepared, it waits for the underneath thread to finish its query
 execution (that may be some prepared already).</p>
 <p>As result, similarly to the lazy approach of the above, the browser renders
 result list gradually, but unlike to the lazy approach, relatively fast.</p>
+<img alt="_images/promised-loading.gif" src="_images/promised-loading.gif" />
 </div>
 <div class="section" id="how-to-setup">
 <h2>How to setup<a class="headerlink" href="#how-to-setup" title="Permalink to this headline">¶</a></h2>

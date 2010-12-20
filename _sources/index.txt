@@ -28,6 +28,8 @@ Most of operations that depend on models are finished in controllers. ::
 Codes like this pattern cause a *blank screen* when the browser are loading it.
 Then, the result list are rendered suddenly at once.
 
+.. image:: _static/eager-loading.gif
+
 To avoid the *blank screen*, we can make queries lazy::
 
     def list_posts():
@@ -49,6 +51,8 @@ the template is being rendered. As a result, the browser renders whole result
 list slightly slowly but gradually. This *lazy* approach helps hasty users
 to feel that they are waiting less, but total elapsed time still doesn't become
 shorter.
+
+.. image:: _static/lazy-loading.gif
 
 What SQLAlchemy-Future does is helping programmers to parallelize queries
 easily. What you have to do is just to place :meth:`~future.Query.promise()`
@@ -72,6 +76,8 @@ execution (that may be some prepared already).
 
 As result, similarly to the lazy approach of the above, the browser renders
 result list gradually, but unlike to the lazy approach, relatively fast.
+
+.. image:: _static/promised-loading.gif
 
 
 How to setup
